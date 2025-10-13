@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tournament-platform
+  labels:
+    app: tournament-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tournament-platform
+  template:
+    metadata:
+      labels:
+        app: tournament-platform
+    spec:
+      containers:
+        - name: app
+          image: gaming-tournament-platform-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "default"
+
