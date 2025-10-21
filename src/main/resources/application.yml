@@ -3,19 +3,41 @@ spring:
     url: jdbc:h2:mem:tourdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driverClassName: org.h2.Driver
     username: sa
-    password: 
+    password:
   jpa:
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
     open-in-view: false
   h2:
     console:
       enabled: true
       path: /h2
+  flyway:
+    enabled: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret-value: "mySecretKeyForJWTGenerationInTournamentPlatform2024MakeItLongEnough"
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+# JWT Configuration
+jwt:
+  secret: "mySecretKeyForJWTGenerationInTournamentPlatform2024MakeItLongEnough"
+  expiration: 86400000  # 24 hours
+
 server:
-  port: 8080
+  port: 8081
 
-
+# Logging (optional - add for debugging)
+logging:
+  level:
+    com.tournament: DEBUG
+    org.springframework.security: DEBUG
