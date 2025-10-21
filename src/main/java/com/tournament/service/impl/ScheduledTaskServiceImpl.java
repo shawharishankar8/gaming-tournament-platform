@@ -2,6 +2,7 @@ package com.tournament.service.impl;
 
 import com.tournament.model.entity.Tournament;
 import com.tournament.model.enums.TournamentStatus;
+import com.tournament.repository.MatchRepository;
 import com.tournament.repository.TournamentRepository;
 import com.tournament.service.BracketGeneratorService;
 import com.tournament.service.ScheduledTaskService;
@@ -15,11 +16,14 @@ import java.util.List;
 public class ScheduledTaskServiceImpl implements ScheduledTaskService {
 	private final TournamentRepository tournamentRepository;
 	private final BracketGeneratorService bracketGeneratorService;
+    private final MatchRepository matchRepository;
 
-	public ScheduledTaskServiceImpl(TournamentRepository tournamentRepository,
-	                                BracketGeneratorService bracketGeneratorService) {
+    public ScheduledTaskServiceImpl(TournamentRepository tournamentRepository,
+                                    BracketGeneratorService bracketGeneratorService,
+                                    MatchRepository matchRepository) {
 		this.tournamentRepository = tournamentRepository;
 		this.bracketGeneratorService = bracketGeneratorService;
+        this.matchRepository = matchRepository;
 	}
 
 	@Override
@@ -43,6 +47,15 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
 	@Override
 	@Scheduled(fixedDelay = 600000)
 	public void finalizeCompletedTournaments() {
-		// Minimal placeholder; in full impl, detect final winners and set COMPLETED
+        var inProgress = tournamentRepository.findByStatus(TournamentStatus.IN_PROGRESS);
+        for (Tournament t : inProgress) {
+            long total = matchRepository.countByTournament(t);
+            if (total == 0) continue;
+            long resolved = matchRepository.countByTournamentAndWinnerIsNotNull(t);
+            if (resolved == total) {
+                t.setStatus(TournamentStatus.COMPLETED);
+                tournamentRepository.save(t);
+            }
+        }
 	}
 }

@@ -7,7 +7,9 @@ import com.tournament.repository.MatchRepository;
 import com.tournament.repository.TournamentRegistrationRepository;
 import com.tournament.repository.TournamentRepository;
 import com.tournament.service.BracketGeneratorService;
-import com.tournament.util.BracketGenerator;
+import com.tournament.service.strategy.EloMatchmakingStrategy;
+import com.tournament.service.strategy.MatchmakingContext;
+import com.tournament.service.strategy.MatchmakingStrategy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,8 +36,10 @@ public class BracketGeneratorServiceImpl implements BracketGeneratorService {
         Tournament t = tournamentRepository.findById(tournamentId).orElseThrow();
         List<Player> players = registrationRepository.findByTournament(t)
                 .stream().map(r -> r.getPlayer()).collect(Collectors.toList());
+        MatchmakingStrategy strategy = new EloMatchmakingStrategy();
+        MatchmakingContext context = new MatchmakingContext(strategy);
         int round = 1;
-        for (var pair : BracketGenerator.generateSingleEliminationPairs(players)) {
+        for (var pair : context.pair(players)) {
             Match m = new Match();
             m.setTournament(t);
             m.setPlayer1(pair[0]);

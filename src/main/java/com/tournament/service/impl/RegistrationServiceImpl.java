@@ -4,6 +4,7 @@ import com.tournament.model.entity.Player;
 import com.tournament.model.entity.Tournament;
 import com.tournament.model.entity.TournamentRegistration;
 import com.tournament.model.enums.TournamentStatus;
+import com.tournament.exception.DuplicateRegistrationException;
 import com.tournament.repository.PlayerRepository;
 import com.tournament.repository.TournamentRegistrationRepository;
 import com.tournament.repository.TournamentRepository;
@@ -38,6 +39,9 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new IllegalStateException("Tournament is full");
         }
         Player player = playerRepository.findById(playerId).orElseThrow();
+        if (registrationRepository.existsByTournamentAndPlayer(tournament, player)) {
+            throw new DuplicateRegistrationException("Player already registered for this tournament");
+        }
         TournamentRegistration reg = new TournamentRegistration();
         reg.setTournament(tournament);
         reg.setPlayer(player);

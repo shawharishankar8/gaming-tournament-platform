@@ -12,6 +12,8 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
     List<Match> findByTournamentOrderByRoundNumberAsc(Tournament tournament);
     List<Match> findByTournamentAndRoundNumberOrderByIdAsc(Tournament tournament, int roundNumber);
     long countByTournamentAndRoundNumberAndWinnerIsNull(Tournament tournament, int roundNumber);
+    long countByTournament(Tournament tournament);
+    long countByTournamentAndWinnerIsNotNull(Tournament tournament);
 }
 
 
