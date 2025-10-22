@@ -3,7 +3,7 @@ INSERT INTO users (username, email, password, role, created_at, updated_at)
 VALUES (
     'admin',
     'admin@tournament.com',
-    '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a', -- bcrypt hash for 'admin123'
+    '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a',
     'ADMIN',
     NOW(),
     NOW()

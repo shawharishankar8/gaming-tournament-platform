@@ -1,35 +1,68 @@
+
 services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: tournament-postgres
+    environment:
+      POSTGRES_DB: tournament_platform
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - tournament-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tournament_platform"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: tournament-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - tournament-network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
   app:
     build:
       context: .
-      dockerfile: docker/Dockerfile.multistage
+      dockerfile: Dockerfile
+    container_name: tournament-app
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - DB_HOST=postgres
-      - DB_NAME=tournament_platform
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/tournament_platform
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tournament-network
     restart: unless-stopped
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    restart: unless-stopped
-  postgres:
-    image: postgres:14-alpine
-    environment:
-      - POSTGRES_DB=tournament_platform
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d tournament_platform"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  tournament-network:
+    driver: bridge
 
