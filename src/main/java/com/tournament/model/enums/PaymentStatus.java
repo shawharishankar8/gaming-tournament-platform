@@ -2,9 +2,12 @@ package com.tournament.model.enums;
 
 public enum PaymentStatus {
     PENDING,
-    PAID,
+    PROCESSING,
+    SUCCEEDED,
+    FAILED,
     REFUNDED,
-    FAILED
+    PARTIALLY_REFUNDED,
+    NOT_REQUIRED
 }
 
 

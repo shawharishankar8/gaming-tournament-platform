@@ -21,6 +21,10 @@ public class TournamentRegistration extends BaseEntity {
     @Column(nullable = false)
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
     @Column
     private Integer seedNumber;
 
@@ -32,6 +36,8 @@ public class TournamentRegistration extends BaseEntity {
     public void setPaymentStatus(PaymentStatus paymentStatus) { this.paymentStatus = paymentStatus; }
     public Integer getSeedNumber() { return seedNumber; }
     public void setSeedNumber(Integer seedNumber) { this.seedNumber = seedNumber; }
+    public Payment getPayment() { return payment; }
+    public void setPayment(Payment payment) { this.payment = payment; }
 }
 
 
