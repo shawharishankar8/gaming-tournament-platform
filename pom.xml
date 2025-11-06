@@ -144,7 +144,11 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <!-- FlyWay Db -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
         <!-- 🔧 UTILITIES -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

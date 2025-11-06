@@ -18,6 +18,7 @@ import com.stripe.model.Event;
 import com.stripe.net.Webhook;
 import com.stripe.param.PaymentIntentCreateParams;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -229,6 +230,32 @@ public class PaymentServiceImpl implements PaymentService {
             throw new RuntimeException("Webhook error: " + e.getMessage(), e);
         }
     }
+    // Add this method to PaymentServiceImpl to check current Stripe configuration
+    @PostConstruct
+    public void diagnoseStripeSetup() {
+        logger.info("=== STRIPE SETUP DIAGNOSIS ===");
+
+        // Check if Stripe API key is set
+        boolean stripeKeySet = Stripe.apiKey != null && !Stripe.apiKey.isEmpty();
+        logger.info("Stripe API Key Set: {}", stripeKeySet);
+
+        if (stripeKeySet) {
+            logger.info("Stripe Key Preview: {}...",
+                    Stripe.apiKey.substring(0, Math.min(8, Stripe.apiKey.length())));
+
+            // Test Stripe connectivity
+            testStripeConnectivity();
+        } else {
+            logger.error("❌ Stripe API Key is NOT set!");
+            logger.info("Check: application.yml -> stripe.secret-key");
+            logger.info("Or environment variable: STRIPE_SECRET_KEY");
+        }
+
+        // Check webhook secret
+        boolean webhookSecretSet = stripeWebhookSecret != null && !stripeWebhookSecret.isEmpty();
+        logger.info("Webhook Secret Set: {}", webhookSecretSet);
+    }
+
 
     @Override
     @Transactional
@@ -327,4 +354,5 @@ public class PaymentServiceImpl implements PaymentService {
             logger.error("Stripe connectivity test: FAILED - {}", e.getMessage());
         }
     }
+
 }

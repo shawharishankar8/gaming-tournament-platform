@@ -28,16 +28,17 @@ public class Payment extends BaseEntity {
     @Column(nullable = false)
     private PaymentStatus status = PaymentStatus.PENDING;
 
-    @Column(unique = true)
+    @Column(name = "stripe_payment_intent_id", unique = true)
     private String stripePaymentIntentId;
 
-    @Column(unique = true)
+    @Column(name = "stripe_payment_method_id", unique = true)
     private String stripePaymentMethodId;
+
 
     @Column
     private String description;
 
-    @Column
+    @Column(name = "failure_message")
     private String failureMessage;
 
     // Constructors
